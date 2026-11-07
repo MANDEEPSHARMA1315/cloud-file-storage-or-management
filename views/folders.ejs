@@ -1,0 +1,116 @@
+<%- include('partials/header') %>
+
+<div class="app-wrapper d-flex">
+  <!-- Sidebar -->
+  <%- include('partials/sidebar') %>
+
+  <!-- Main Content Area -->
+  <div class="main-content flex-grow-1 min-vh-100 d-flex flex-column bg-light">
+    <!-- Topbar -->
+    <%- include('partials/topbar') %>
+
+    <!-- Page Body -->
+    <main class="content-body p-3 p-lg-4 flex-grow-1">
+      <div class="container-fluid p-0">
+        
+        <!-- Alerts and Flash Messages -->
+        <%- include('partials/toast') %>
+
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+          <div>
+            <h3 class="fw-bold text-dark mb-1">
+              <i class="fa-solid fa-folder-tree text-info me-2"></i>My Folders
+            </h3>
+            <p class="text-muted small mb-0">Organize and manage your directory structure in cloud storage.</p>
+          </div>
+          <div>
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#newFolderModal">
+              <i class="fa-solid fa-folder-plus me-2"></i>Create New Folder
+            </button>
+          </div>
+        </div>
+
+        <!-- Folders Grid -->
+        <% if (folders && folders.length > 0) { %>
+          <div class="row g-3">
+            <% folders.forEach(function(folder) { %>
+              <div class="col-sm-6 col-md-4 col-xl-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 hover-card folder-card transition-all position-relative">
+                  <div class="d-flex align-items-start justify-content-between mb-3">
+                    <div class="bg-light rounded-3 p-3 d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
+                      <i class="fa-solid fa-folder fs-2" style="color: <%= folder.color || '#4f46e5' %>;"></i>
+                    </div>
+
+                    <div class="dropdown">
+                      <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;">
+                        <i class="fa-solid fa-ellipsis-vertical text-muted"></i>
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
+                        <li>
+                          <a class="dropdown-item py-2" href="/files?folderId=<%= folder._id %>">
+                            <i class="fa-solid fa-folder-open me-2 text-primary"></i>Open Folder
+                          </a>
+                        </li>
+                        <li>
+                          <button 
+                            class="dropdown-item py-2 btn-rename-folder" 
+                            data-folder-id="<%= folder._id %>"
+                            data-folder-name="<%= folder.folderName %>"
+                            data-folder-color="<%= folder.color || '#4f46e5' %>"
+                          >
+                            <i class="fa-solid fa-pen me-2 text-info"></i>Rename
+                          </button>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                          <button 
+                            class="dropdown-item py-2 text-danger btn-delete" 
+                            data-action="/api/folders/<%= folder._id %>"
+                            data-item-name="<%= folder.folderName %>"
+                            data-item-type="folder"
+                          >
+                            <i class="fa-solid fa-trash me-2"></i>Move to Trash
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <a href="/files?folderId=<%= folder._id %>" class="text-decoration-none">
+                    <h5 class="fw-bold text-dark text-truncate mb-1" title="<%= folder.folderName %>">
+                      <%= folder.folderName %>
+                    </h5>
+                  </a>
+
+                  <div class="d-flex align-items-center justify-content-between text-muted small mt-3 pt-2 border-top">
+                    <span><i class="fa-solid fa-file me-1"></i> <%= folder.fileCount %> files</span>
+                    <span><%= folder.formattedSize %></span>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="card border-0 shadow-sm rounded-4 bg-white text-center py-5">
+            <div class="card-body">
+              <i class="fa-solid fa-folder-tree display-3 text-muted mb-3 d-block"></i>
+              <h5 class="fw-bold text-dark">No folders created yet</h5>
+              <p class="text-muted small mb-4">Create folders to organize your files, photos, and project assets.</p>
+              <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#newFolderModal">
+                <i class="fa-solid fa-plus me-1"></i> Create First Folder
+              </button>
+            </div>
+          </div>
+        <% } %>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Include Shared Modals -->
+<%- include('partials/modals') %>
+
+<%- include('partials/footer') %>
+

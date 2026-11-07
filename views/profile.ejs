@@ -1,0 +1,174 @@
+<%- include('partials/header') %>
+
+<div class="app-wrapper d-flex">
+  <!-- Sidebar -->
+  <%- include('partials/sidebar') %>
+
+  <!-- Main Content Area -->
+  <div class="main-content flex-grow-1 min-vh-100 d-flex flex-column bg-light">
+    <!-- Topbar -->
+    <%- include('partials/topbar') %>
+
+    <!-- Page Body -->
+    <main class="content-body p-3 p-lg-4 flex-grow-1">
+      <div class="container-fluid p-0">
+        
+        <!-- Alerts and Flash Messages -->
+        <%- include('partials/toast') %>
+
+        <!-- Header -->
+        <div class="mb-4">
+          <h3 class="fw-bold text-dark mb-1">
+            <i class="fa-solid fa-gear text-secondary me-2"></i>Account & Storage Settings
+          </h3>
+          <p class="text-muted small mb-0">Manage your profile credentials, security passwords, and cloud storage allocation.</p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Left Column: User Profile & Security -->
+          <div class="col-lg-7">
+            <!-- Profile Info Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+              <h5 class="fw-bold text-dark mb-3">
+                <i class="fa-solid fa-user text-primary me-2"></i>Profile Information
+              </h5>
+              
+              <form action="/profile" method="POST">
+                <div class="mb-3">
+                  <label for="name" class="form-label small fw-semibold text-muted">Full Name</label>
+                  <input type="text" name="name" id="name" class="form-control" value="<%= user.name %>" required>
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label small fw-semibold text-muted">Email Address</label>
+                  <input type="email" name="email" id="email" class="form-control" value="<%= user.email %>" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold text-muted">Account Registered</label>
+                  <input type="text" class="form-control bg-light text-muted" value="<%= new Date(user.createdAt).toLocaleDateString() %>" readonly>
+                </div>
+                <button type="submit" class="btn btn-primary rounded-pill px-4">
+                  <i class="fa-solid fa-floppy-disk me-2"></i>Save Profile
+                </button>
+              </form>
+            </div>
+
+            <!-- Change Password Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+              <h5 class="fw-bold text-dark mb-3">
+                <i class="fa-solid fa-shield-halved text-success me-2"></i>Change Password
+              </h5>
+              
+              <form action="/profile/password" method="POST">
+                <div class="mb-3">
+                  <label for="currentPassword" class="form-label small fw-semibold text-muted">Current Password</label>
+                  <input type="password" name="currentPassword" id="currentPassword" class="form-control" placeholder="Enter current password" required>
+                </div>
+                <div class="mb-3">
+                  <label for="newPassword" class="form-label small fw-semibold text-muted">New Password</label>
+                  <input type="password" name="newPassword" id="newPassword" class="form-control" placeholder="Minimum 6 characters" minlength="6" required>
+                </div>
+                <div class="mb-3">
+                  <label for="confirmNewPassword" class="form-label small fw-semibold text-muted">Confirm New Password</label>
+                  <input type="password" name="confirmNewPassword" id="confirmNewPassword" class="form-control" placeholder="Re-enter new password" minlength="6" required>
+                </div>
+                <button type="submit" class="btn btn-outline-dark rounded-pill px-4">
+                  <i class="fa-solid fa-key me-2"></i>Update Password
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Right Column: Storage Quota & Cloud Info -->
+          <div class="col-lg-5">
+            <!-- Storage Quota Monitor -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+              <h5 class="fw-bold text-dark mb-3">
+                <i class="fa-solid fa-hard-drive text-warning me-2"></i>Storage Quota Monitor
+              </h5>
+
+              <% 
+                const quota = user.storageQuota || 524288000;
+                const used = user.storageUsed || 0;
+                const pct = Math.min(Math.round((used / quota) * 100), 100);
+              %>
+
+              <div class="text-center py-3">
+                <div class="display-5 fw-bold text-dark mb-1"><%= pct %>%</div>
+                <div class="text-muted small">of total quota consumed</div>
+              </div>
+
+              <div class="progress mb-3" style="height: 10px;">
+                <div class="progress-bar <%= pct >= 80 ? 'bg-warning' : 'bg-primary' %>" style="width: <%= pct %>%"></div>
+              </div>
+
+              <div class="d-flex justify-content-between small text-muted mb-4">
+                <span><%= typeof storageInfo !== 'undefined' && storageInfo ? storageInfo.formattedUsed : '0 B' %> used</span>
+                <span><%= typeof storageInfo !== 'undefined' && storageInfo ? storageInfo.formattedQuota : '500 MB' %> quota</span>
+              </div>
+
+              <hr>
+
+              <!-- Quota Adjustment (Admin/Tester Tool) -->
+              <h6 class="small fw-bold text-dark mb-2">Adjust Storage Quota (Testing Quota Simulator)</h6>
+              <p class="text-muted small mb-3">Change your allocated quota to test warning thresholds and quota limits.</p>
+              
+              <form action="/profile/quota" method="POST" class="d-flex gap-2">
+                <select name="quotaMB" class="form-select">
+                  <option value="10" <%= Math.round(quota / (1024 * 1024)) === 10 ? 'selected' : '' %>>10 MB (Strict Test)</option>
+                  <option value="100" <%= Math.round(quota / (1024 * 1024)) === 100 ? 'selected' : '' %>>100 MB</option>
+                  <option value="500" <%= Math.round(quota / (1024 * 1024)) === 500 ? 'selected' : '' %>>500 MB (Default)</option>
+                  <option value="1024" <%= Math.round(quota / (1024 * 1024)) === 1024 ? 'selected' : '' %>>1 GB</option>
+                  <option value="5120" <%= Math.round(quota / (1024 * 1024)) === 5120 ? 'selected' : '' %>>5 GB</option>
+                </select>
+                <button type="submit" class="btn btn-outline-primary text-nowrap rounded-pill px-3">
+                  Apply Quota
+                </button>
+              </form>
+            </div>
+
+            <!-- AWS Cloud Status -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+              <h5 class="fw-bold text-dark mb-3">
+                <i class="fa-brands fa-aws text-warning me-2"></i>Cloud Infrastructure
+              </h5>
+              
+              <ul class="list-group list-group-flush small">
+                <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                  <span class="text-muted">Cloud Storage Provider:</span>
+                  <span class="fw-bold text-dark"><i class="fa-brands fa-aws me-1 text-warning"></i> AWS S3</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                  <span class="text-muted">SDK Implementation:</span>
+                  <span class="fw-bold text-dark">AWS SDK for JS v3</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                  <span class="text-muted">Database Engine:</span>
+                  <span class="fw-bold text-dark">MongoDB (Mongoose ODM)</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                  <span class="text-muted">Download Security:</span>
+                  <span class="badge bg-success-subtle text-success">Presigned URLs (15m TTL)</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                  <span class="text-muted">Active Files:</span>
+                  <span class="fw-bold text-dark"><%= stats.fileCount %> files</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                  <span class="text-muted">Active Folders:</span>
+                  <span class="fw-bold text-dark"><%= stats.folderCount %> folders</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Include Shared Modals -->
+<%- include('partials/modals') %>
+
+<%- include('partials/footer') %>
+

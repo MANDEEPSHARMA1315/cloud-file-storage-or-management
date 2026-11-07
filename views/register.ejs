@@ -1,0 +1,135 @@
+<%- include('partials/header') %>
+
+<div class="min-vh-100 d-flex flex-column justify-content-center bg-light py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5 col-xl-4">
+        
+        <!-- App Brand Logo -->
+        <div class="text-center mb-4">
+          <a href="/" class="d-inline-flex align-items-center text-decoration-none text-dark">
+            <div class="brand-icon bg-primary text-white rounded-3 d-flex align-items-center justify-content-center me-2 shadow" style="width: 44px; height: 44px;">
+              <i class="fa-solid fa-cloud fs-4"></i>
+            </div>
+            <span class="fs-3 fw-bold text-primary">Cloud</span><span class="fs-3 fw-bold text-dark">Drive</span>
+          </a>
+          <p class="text-muted small mt-1">Get 500 MB of free secure AWS S3 cloud storage</p>
+        </div>
+
+        <!-- Flash Messages -->
+        <%- include('partials/toast') %>
+
+        <!-- Database Connection Warning if not connected -->
+        <% if (typeof isDbConnected !== 'undefined' && !isDbConnected) { %>
+          <div class="alert alert-warning border-0 shadow-sm rounded-4 p-3 mb-4 d-flex align-items-start">
+            <i class="fa-solid fa-triangle-exclamation text-warning fs-4 me-3 mt-1"></i>
+            <div>
+              <div class="fw-bold text-dark small">MongoDB Service Not Connected</div>
+              <div class="text-muted" style="font-size: 0.8rem;">
+                Local MongoDB is not running on <code>localhost:27017</code>. To create an account, start MongoDB locally or configure your MongoDB Atlas URI in <code>.env</code>.
+              </div>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Register Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+          <h4 class="fw-bold text-dark mb-3">Create Free Account</h4>
+          
+          <form action="/register" method="POST" id="registerForm">
+            <div class="mb-3">
+              <label for="name" class="form-label small fw-semibold text-muted">Full Name</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                  <i class="fa-solid fa-user"></i>
+                </span>
+                <input 
+                  type="text" 
+                  name="name" 
+                  id="name" 
+                  class="form-control border-start-0" 
+                  placeholder="e.g. Alex Morgan" 
+                  value="<%= typeof name !== 'undefined' ? name : '' %>"
+                  required 
+                  autofocus
+                >
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label small fw-semibold text-muted">Email Address</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                  <i class="fa-solid fa-envelope"></i>
+                </span>
+                <input 
+                  type="email" 
+                  name="email" 
+                  id="email" 
+                  class="form-control border-start-0" 
+                  placeholder="name@example.com" 
+                  value="<%= typeof email !== 'undefined' ? email : '' %>"
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label small fw-semibold text-muted">Password</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                  <i class="fa-solid fa-lock"></i>
+                </span>
+                <input 
+                  type="password" 
+                  name="password" 
+                  id="password" 
+                  class="form-control border-start-0" 
+                  placeholder="Minimum 6 characters" 
+                  minlength="6"
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label small fw-semibold text-muted">Confirm Password</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                  <i class="fa-solid fa-shield-check"></i>
+                </span>
+                <input 
+                  type="password" 
+                  name="confirmPassword" 
+                  id="confirmPassword" 
+                  class="form-control border-start-0" 
+                  placeholder="Re-enter password" 
+                  minlength="6"
+                  required
+                >
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-semibold shadow-sm mb-3">
+              <i class="fa-solid fa-user-plus me-2"></i>Sign Up
+            </button>
+          </form>
+
+          <div class="text-center mt-3 pt-3 border-top">
+            <span class="text-muted small">Already have an account?</span>
+            <a href="/login" class="small fw-semibold text-decoration-none ms-1">Sign In</a>
+          </div>
+        </div>
+
+        <!-- Tech Footer -->
+        <div class="text-center text-muted small mt-4">
+          <i class="fa-solid fa-lock me-1 text-success"></i> Passwords secured with bcrypt &bull; MongoDB Backend
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
+

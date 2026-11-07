@@ -1,0 +1,90 @@
+<header class="topbar bg-white border-bottom px-3 px-lg-4 py-2 d-flex align-items-center justify-content-between sticky-top shadow-sm">
+  <!-- Left: Sidebar Mobile Toggle & Search -->
+  <div class="d-flex align-items-center flex-grow-1 me-3">
+    <button class="btn btn-outline-secondary d-md-none me-3" id="sidebarOpenBtn" type="button" aria-label="Open sidebar">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    
+    <!-- Search Bar -->
+    <form action="/files" method="GET" class="search-form d-flex align-items-center flex-grow-1" style="max-width: 520px;">
+      <div class="input-group">
+        <span class="input-group-text bg-light border-end-0 text-muted">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+        <input 
+          type="search" 
+          name="search" 
+          id="globalSearchInput" 
+          class="form-control bg-light border-start-0 ps-0" 
+          placeholder="Search files, documents, images..." 
+          value="<%= typeof search !== 'undefined' ? search : '' %>"
+          autocomplete="off"
+        >
+        <button class="btn btn-light border" type="submit">Search</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Right: Storage Pill, Actions & User Dropdown -->
+  <div class="d-flex align-items-center">
+    <!-- Storage Status Pill -->
+    <% 
+      const topStorage = typeof storageInfo !== 'undefined' && storageInfo ? storageInfo : null;
+    %>
+    <% if (topStorage) { %>
+      <div class="d-none d-lg-flex align-items-center me-3 px-3 py-1 bg-light rounded-pill border">
+        <i class="fa-solid fa-cloud text-primary me-2"></i>
+        <span class="small fw-medium text-muted me-2"><%= topStorage.formattedUsed %> / <%= topStorage.formattedQuota %></span>
+        <span class="badge <%= topStorage.percentage >= 80 ? 'bg-warning text-dark' : 'bg-primary' %> rounded-pill">
+          <%= topStorage.percentage %>%
+        </span>
+      </div>
+    <% } %>
+
+    <!-- Upload Quick Action -->
+    <button class="btn btn-sm btn-outline-primary rounded-pill me-3 d-none d-sm-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#uploadModal">
+      <i class="fa-solid fa-cloud-arrow-up me-1"></i> Upload
+    </button>
+
+    <!-- User Profile Dropdown -->
+    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+      <div class="dropdown">
+        <button class="btn btn-light rounded-pill d-flex align-items-center p-1 pe-3 border" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <div class="avatar-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-weight: 600; font-size: 0.85rem;">
+            <%= currentUser.name.charAt(0).toUpperCase() %>
+          </div>
+          <span class="d-none d-md-inline small fw-semibold text-dark"><%= currentUser.name.split(' ')[0] %></span>
+          <i class="fa-solid fa-chevron-down ms-2 text-muted" style="font-size: 0.7rem;"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2" aria-labelledby="userMenuDropdown" style="min-width: 220px;">
+          <li class="px-3 py-2 border-bottom mb-2">
+            <div class="fw-bold text-dark"><%= currentUser.name %></div>
+            <div class="small text-muted text-truncate"><%= currentUser.email %></div>
+          </li>
+          <li>
+            <a class="dropdown-item rounded-2 py-2 d-flex align-items-center" href="/profile">
+              <i class="fa-solid fa-user-gear me-2 text-primary" style="width: 18px;"></i> Account Settings
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item rounded-2 py-2 d-flex align-items-center" href="/files">
+              <i class="fa-solid fa-folder me-2 text-warning" style="width: 18px;"></i> My Files
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item rounded-2 py-2 d-flex align-items-center" href="/trash">
+              <i class="fa-solid fa-trash me-2 text-danger" style="width: 18px;"></i> Trash
+            </a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <a class="dropdown-item rounded-2 py-2 text-danger d-flex align-items-center" href="/logout">
+              <i class="fa-solid fa-right-from-bracket me-2" style="width: 18px;"></i> Sign Out
+            </a>
+          </li>
+        </ul>
+      </div>
+    <% } %>
+  </div>
+</header>
+

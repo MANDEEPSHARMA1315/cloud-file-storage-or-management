@@ -1,0 +1,41 @@
+{
+  "name": "cloud-file-storage",
+  "version": "1.0.0",
+  "description": "Cloud-Based File Storage and Management System using Node.js, Express, EJS, MongoDB, and AWS S3",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "cloud-storage",
+    "aws-s3",
+    "mongodb",
+    "express",
+    "file-manager",
+    "google-drive-clone"
+  ],
+  "author": "Cloud Storage Dev",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.750.0",
+    "@aws-sdk/s3-request-presigner": "^3.750.0",
+    "bcryptjs": "^3.0.2",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "jsonwebtoken": "^9.0.2",
+    "method-override": "^3.0.0",
+    "mime-types": "^2.1.35",
+    "mongoose": "^8.10.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
+

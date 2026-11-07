@@ -1,0 +1,168 @@
+<%- include('partials/header') %>
+
+<div class="app-wrapper d-flex">
+  <!-- Sidebar -->
+  <%- include('partials/sidebar') %>
+
+  <!-- Main Content Area -->
+  <div class="main-content flex-grow-1 min-vh-100 d-flex flex-column bg-light">
+    <!-- Topbar -->
+    <%- include('partials/topbar') %>
+
+    <!-- Page Body -->
+    <main class="content-body p-3 p-lg-4 flex-grow-1">
+      <div class="container-fluid p-0">
+        
+        <!-- Alerts and Flash Messages -->
+        <%- include('partials/toast') %>
+
+        <!-- Header & Empty Trash Button -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+          <div>
+            <h3 class="fw-bold text-dark mb-1">
+              <i class="fa-solid fa-trash-can text-danger me-2"></i>Trash Bin
+            </h3>
+            <p class="text-muted small mb-0">Items in trash can be restored or permanently removed from AWS S3.</p>
+          </div>
+          <% if ((files && files.length > 0) || (folders && folders.length > 0)) { %>
+            <div>
+              <form action="/api/files/empty-trash" method="POST" onsubmit="return confirm('WARNING: Are you sure you want to permanently delete all items in trash? Files will be removed from AWS S3 and cannot be recovered.');">
+                <button type="submit" class="btn btn-outline-danger rounded-pill px-4 shadow-sm">
+                  <i class="fa-solid fa-fire me-2"></i>Empty Trash Forever
+                </button>
+              </form>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Trashed Folders -->
+        <% if (folders && folders.length > 0) { %>
+          <div class="mb-4">
+            <h6 class="text-uppercase text-muted fw-bold small mb-3">
+              <i class="fa-solid fa-folder me-2 text-warning"></i>Trashed Folders (<%= folders.length %>)
+            </h6>
+            <div class="row g-3">
+              <% folders.forEach(function(folder) { %>
+                <div class="col-sm-6 col-md-4 col-xl-3">
+                  <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                      <div class="d-flex align-items-center text-truncate me-2">
+                        <i class="fa-solid fa-folder text-muted fs-3 me-3"></i>
+                        <div class="text-truncate">
+                          <span class="fw-bold text-dark text-truncate d-block" title="<%= folder.folderName %>">
+                            <%= folder.folderName %>
+                          </span>
+                          <span class="text-muted" style="font-size: 0.72rem;">Trashed: <%= folder.trashedAt ? new Date(folder.trashedAt).toLocaleDateString() : 'Recently' %></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-2 pt-2 border-top">
+                      <form action="/api/folders/<%= folder._id %>/restore" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3" title="Restore Folder">
+                          <i class="fa-solid fa-rotate-left me-1"></i> Restore
+                        </button>
+                      </form>
+                      <button 
+                        class="btn btn-sm btn-outline-danger rounded-pill px-3 btn-delete" 
+                        data-action="/api/folders/<%= folder._id %>/permanent"
+                        data-item-name="<%= folder.folderName %>"
+                        data-item-type="folder"
+                        data-permanent="true"
+                        title="Delete Forever"
+                      >
+                        <i class="fa-solid fa-xmark me-1"></i> Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Trashed Files -->
+        <% if (files && files.length > 0) { %>
+          <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+            <div class="card-header bg-white border-bottom p-3">
+              <h6 class="text-uppercase text-muted fw-bold small mb-0">
+                <i class="fa-solid fa-file me-2 text-primary"></i>Trashed Files (<%= files.length %>)
+              </h6>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted small text-uppercase">
+                  <tr>
+                    <th class="ps-4">File Name</th>
+                    <th>Category</th>
+                    <th>Size</th>
+                    <th>Trashed Date</th>
+                    <th class="text-end pe-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% files.forEach(function(file) { %>
+                    <tr>
+                      <td class="ps-4">
+                        <div class="d-flex align-items-center">
+                          <i class="fa-solid fa-file text-muted fs-4 me-3"></i>
+                          <div>
+                            <div class="fw-semibold text-dark text-truncate" style="max-width: 320px;" title="<%= file.originalName %>">
+                              <%= file.originalName %>
+                            </div>
+                            <span class="text-muted" style="font-size: 0.72rem;"><%= file.mimeType %></span>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="badge bg-light text-dark border text-capitalize"><%= file.category %></span>
+                      </td>
+                      <td class="text-muted small fw-medium"><%= file.formattedSize %></td>
+                      <td class="text-muted small"><%= file.trashedAt ? new Date(file.trashedAt).toLocaleDateString() : 'Recently' %></td>
+                      <td class="text-end pe-4">
+                        <div class="d-inline-flex gap-2">
+                          <form action="/api/files/<%= file._id %>/restore" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3" title="Restore File">
+                              <i class="fa-solid fa-rotate-left me-1"></i> Restore
+                            </button>
+                          </form>
+                          <button 
+                            class="btn btn-sm btn-outline-danger rounded-pill px-3 btn-delete" 
+                            data-action="/api/files/<%= file._id %>/permanent"
+                            data-item-name="<%= file.originalName %>"
+                            data-item-type="file"
+                            data-permanent="true"
+                            title="Delete Permanently from AWS S3"
+                          >
+                            <i class="fa-solid fa-fire me-1"></i> Delete Forever
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Empty Trash State -->
+        <% if ((!files || files.length === 0) && (!folders || folders.length === 0)) { %>
+          <div class="card border-0 shadow-sm rounded-4 bg-white text-center py-5">
+            <div class="card-body">
+              <i class="fa-solid fa-trash-can display-3 text-muted mb-3 d-block"></i>
+              <h5 class="fw-bold text-dark">Trash is empty</h5>
+              <p class="text-muted small mb-0">Items you delete will be kept here until you choose to permanently purge them.</p>
+            </div>
+          </div>
+        <% } %>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Include Shared Modals -->
+<%- include('partials/modals') %>
+
+<%- include('partials/footer') %>
+

@@ -1,0 +1,41 @@
+<% if (typeof success_msg !== 'undefined' && success_msg.length > 0) { %>
+  <div class="alert alert-success alert-dismissible fade show shadow-sm d-flex align-items-center mb-4" role="alert">
+    <i class="fa-solid fa-circle-check me-2 fs-5"></i>
+    <div><%= success_msg %></div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>
+
+<% if (typeof error_msg !== 'undefined' && error_msg.length > 0) { %>
+  <div class="alert alert-danger alert-dismissible fade show shadow-sm d-flex align-items-center mb-4" role="alert">
+    <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+    <div><%= error_msg %></div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>
+
+<!-- Quota Warning Banner -->
+<% if (typeof storageInfo !== 'undefined' && storageInfo && storageInfo.isNearQuota) { %>
+  <div class="alert alert-warning alert-dismissible fade show shadow-sm d-flex align-items-center mb-4" role="alert">
+    <i class="fa-solid fa-cloud-arrow-up me-2 fs-5 text-warning"></i>
+    <div class="flex-grow-1">
+      <strong>Storage Warning:</strong> You have used <strong><%= storageInfo.percentage %>%</strong> of your storage quota (<%= storageInfo.formattedUsed %> of <%= storageInfo.formattedQuota %>). Consider cleaning up trash or upgrading your quota in Settings.
+    </div>
+    <a href="/profile" class="btn btn-sm btn-outline-dark ms-3">Manage Quota</a>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>
+
+<!-- Live Toast Notifications Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
+  <div id="liveToast" class="toast align-items-center text-white bg-primary border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body d-flex align-items-center">
+        <i id="toastIcon" class="fa-solid fa-circle-info me-2 fs-5"></i>
+        <span id="toastMessage">Notification message</span>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+

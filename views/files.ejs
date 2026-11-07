@@ -1,0 +1,432 @@
+<%- include('partials/header') %>
+
+<div class="app-wrapper d-flex">
+  <!-- Sidebar -->
+  <%- include('partials/sidebar') %>
+
+  <!-- Main Content Area -->
+  <div class="main-content flex-grow-1 min-vh-100 d-flex flex-column bg-light">
+    <!-- Topbar -->
+    <%- include('partials/topbar') %>
+
+    <!-- Page Body -->
+    <main class="content-body p-3 p-lg-4 flex-grow-1">
+      <div class="container-fluid p-0">
+        
+        <!-- Alerts and Flash Messages -->
+        <%- include('partials/toast') %>
+
+        <!-- Breadcrumb Navigation & Top Action Controls -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+          <!-- Folder Breadcrumbs -->
+          <div>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb mb-1">
+                <% breadcrumbs.forEach(function(crumb, index) { %>
+                  <% if (index === breadcrumbs.length - 1) { %>
+                    <li class="breadcrumb-item active fw-bold text-dark fs-5" aria-current="page">
+                      <%= crumb.name %>
+                    </li>
+                  <% } else { %>
+                    <li class="breadcrumb-item">
+                      <a href="/files<%= crumb.id ? '?folderId=' + crumb.id : '' %>" class="text-decoration-none text-primary fs-5">
+                        <%= crumb.name %>
+                      </a>
+                    </li>
+                  <% } %>
+                <% }); %>
+              </ol>
+            </nav>
+            <div class="text-muted small">
+              <%= folders.length %> folders &bull; <%= files.length %> files
+              <% if (search) { %> &bull; Search results for "<strong class="text-dark"><%= search %></strong>" (<a href="/files" class="text-decoration-none">Clear</a>)<% } %>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex align-items-center flex-wrap gap-2">
+            <!-- View Mode Toggle (Grid vs List) -->
+            <div class="btn-group shadow-sm" role="group" aria-label="View Mode">
+              <button type="button" class="btn btn-white border <%= viewMode === 'grid' ? 'active bg-light' : '' %>" id="viewGridBtn" title="Grid View">
+                <i class="fa-solid fa-grip text-muted"></i>
+              </button>
+              <button type="button" class="btn btn-white border <%= viewMode === 'list' ? 'active bg-light' : '' %>" id="viewListBtn" title="List View">
+                <i class="fa-solid fa-list text-muted"></i>
+              </button>
+            </div>
+
+            <!-- New Folder Modal Button -->
+            <button class="btn btn-outline-secondary rounded-pill px-3 shadow-sm bg-white" data-bs-toggle="modal" data-bs-target="#newFolderModal">
+              <i class="fa-solid fa-folder-plus me-1 text-warning"></i> New Folder
+            </button>
+
+            <!-- Upload Modal Button -->
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#uploadModal">
+              <i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Bar & Sort Controls -->
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+          <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            
+            <!-- Category Filter Pills -->
+            <div class="d-flex align-items-center flex-wrap gap-1">
+              <% 
+                const catFilters = [
+                  { id: 'all', label: 'All Files', icon: 'fa-layer-group' },
+                  { id: 'image', label: 'Images', icon: 'fa-file-image' },
+                  { id: 'document', label: 'Docs', icon: 'fa-file-lines' },
+                  { id: 'pdf', label: 'PDFs', icon: 'fa-file-pdf' },
+                  { id: 'video', label: 'Media', icon: 'fa-file-video' },
+                  { id: 'archive', label: 'Archives', icon: 'fa-file-zipper' }
+                ];
+              %>
+              <% catFilters.forEach(function(item) { %>
+                <a 
+                  href="/files?category=<%= item.id %><%= currentFolder ? '&folderId=' + currentFolder._id : '' %><%= sort ? '&sort=' + sort : '' %><%= search ? '&search=' + search : '' %>" 
+                  class="btn btn-sm <%= category === item.id ? 'btn-primary text-white' : 'btn-light text-dark' %> rounded-pill px-3"
+                >
+                  <i class="fa-solid <%= item.icon %> me-1"></i> <%= item.label %>
+                </a>
+              <% }); %>
+            </div>
+
+            <!-- Sort By Selector -->
+            <div class="d-flex align-items-center gap-2">
+              <span class="small text-muted fw-semibold text-nowrap"><i class="fa-solid fa-arrow-down-short-wide me-1"></i> Sort:</span>
+              <select class="form-select form-select-sm" id="sortSelect" onchange="location = this.value;" style="min-width: 170px;">
+                <option value="/files?sort=date-desc<%= currentFolder ? '&folderId=' + currentFolder._id : '' %><%= category ? '&category=' + category : '' %>" <%= sort === 'date-desc' ? 'selected' : '' %>>Newest First</option>
+                <option value="/files?sort=date-asc<%= currentFolder ? '&folderId=' + currentFolder._id : '' %><%= category ? '&category=' + category : '' %>" <%= sort === 'date-asc' ? 'selected' : '' %>>Oldest First</option>
+                <option value="/files?sort=name-asc<%= currentFolder ? '&folderId=' + currentFolder._id : '' %><%= category ? '&category=' + category : '' %>" <%= sort === 'name-asc' ? 'selected' : '' %>>Name (A &rarr; Z)</option>
+                <option value="/files?sort=name-desc<%= currentFolder ? '&folderId=' + currentFolder._id : '' %><%= category ? '&category=' + category : '' %>" <%= sort === 'name-desc' ? 'selected' : '' %>>Name (Z &rarr; A)</option>
+                <option value="/files?sort=size-desc<%= currentFolder ? '&folderId=' + currentFolder._id : '' %><%= category ? '&category=' + category : '' %>" <%= sort === 'size-desc' ? 'selected' : '' %>>Size (Largest)</option>
+                <option value="/files?sort=size-asc<%= currentFolder ? '&folderId=' + currentFolder._id : '' %><%= category ? '&category=' + category : '' %>" <%= sort === 'size-asc' ? 'selected' : '' %>>Size (Smallest)</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Folders Section -->
+        <% if (folders && folders.length > 0) { %>
+          <div class="mb-4">
+            <h6 class="text-uppercase text-muted fw-bold small mb-3" style="letter-spacing: 0.05rem;">
+              <i class="fa-solid fa-folder me-2 text-warning"></i>Folders (<%= folders.length %>)
+            </h6>
+            <div class="row g-3">
+              <% folders.forEach(function(folder) { %>
+                <div class="col-sm-6 col-md-4 col-xl-3">
+                  <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 hover-card folder-card transition-all position-relative">
+                    <div class="d-flex align-items-center justify-content-between">
+                      <a href="/files?folderId=<%= folder._id %>" class="d-flex align-items-center text-decoration-none text-dark flex-grow-1 text-truncate me-2">
+                        <i class="fa-solid fa-folder fs-3 me-3" style="color: <%= folder.color || '#4f46e5' %>;"></i>
+                        <div class="text-truncate">
+                          <span class="fw-bold text-dark text-truncate d-block" title="<%= folder.folderName %>"><%= folder.folderName %></span>
+                          <span class="text-muted" style="font-size: 0.72rem;"><%= new Date(folder.createdAt).toLocaleDateString() %></span>
+                        </div>
+                      </a>
+
+                      <!-- Folder Action Dropdown -->
+                      <div class="dropdown">
+                        <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 32px; height: 32px;">
+                          <i class="fa-solid fa-ellipsis-vertical text-muted"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
+                          <li>
+                            <a class="dropdown-item py-2" href="/files?folderId=<%= folder._id %>">
+                              <i class="fa-solid fa-folder-open me-2 text-primary"></i>Open Folder
+                            </a>
+                          </li>
+                          <li>
+                            <button 
+                              class="dropdown-item py-2 btn-rename-folder" 
+                              data-folder-id="<%= folder._id %>"
+                              data-folder-name="<%= folder.folderName %>"
+                              data-folder-color="<%= folder.color || '#4f46e5' %>"
+                            >
+                              <i class="fa-solid fa-pen me-2 text-info"></i>Rename
+                            </button>
+                          </li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li>
+                            <button 
+                              class="dropdown-item py-2 text-danger btn-delete" 
+                              data-action="/api/folders/<%= folder._id %>"
+                              data-item-name="<%= folder.folderName %>"
+                              data-item-type="folder"
+                            >
+                              <i class="fa-solid fa-trash me-2"></i>Move to Trash
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Files Section -->
+        <div>
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="text-uppercase text-muted fw-bold small mb-0" style="letter-spacing: 0.05rem;">
+              <i class="fa-solid fa-file me-2 text-primary"></i>Files (<%= files.length %>)
+            </h6>
+          </div>
+
+          <% if (files && files.length > 0) { %>
+            
+            <!-- GRID VIEW (Default) -->
+            <div id="filesGridView" class="<%= viewMode === 'list' ? 'd-none' : '' %>">
+              <div class="row g-3">
+                <% files.forEach(function(file) { %>
+                  <div class="col-sm-6 col-md-4 col-xl-3 file-item-wrapper" data-file-name="<%= file.originalName.toLowerCase() %>">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white h-100 hover-card file-card transition-all">
+                      
+                      <!-- Card Preview / Header Thumbnail -->
+                      <div class="card-preview-area bg-light rounded-top-4 p-4 text-center position-relative d-flex align-items-center justify-content-center" style="height: 140px; overflow: hidden;">
+                        <% if (file.category === 'image') { %>
+                          <div class="file-thumb-icon">
+                            <i class="fa-solid fa-file-image fs-1 text-primary"></i>
+                          </div>
+                        <% } else if (file.category === 'pdf') { %>
+                          <div class="file-thumb-icon">
+                            <i class="fa-solid fa-file-pdf fs-1 text-danger"></i>
+                          </div>
+                        <% } else if (file.category === 'document') { %>
+                          <div class="file-thumb-icon">
+                            <i class="fa-solid fa-file-word fs-1 text-info"></i>
+                          </div>
+                        <% } else if (file.category === 'video') { %>
+                          <div class="file-thumb-icon">
+                            <i class="fa-solid fa-file-video fs-1 text-warning"></i>
+                          </div>
+                        <% } else if (file.category === 'audio') { %>
+                          <div class="file-thumb-icon">
+                            <i class="fa-solid fa-file-audio fs-1 text-success"></i>
+                          </div>
+                        <% } else if (file.category === 'archive') { %>
+                          <div class="file-thumb-icon">
+                            <i class="fa-solid fa-file-zipper fs-1 text-secondary"></i>
+                          </div>
+                        <% } else { %>
+                          <div class="file-thumb-icon">
+                            <i class="fa-solid fa-file fs-1 text-dark"></i>
+                          </div>
+                        <% } %>
+
+                        <!-- Star Icon Badge -->
+                        <button 
+                          class="btn btn-sm btn-icon star-btn position-absolute top-0 start-0 m-2 <%= file.isStarred ? 'text-warning' : 'text-muted' %>" 
+                          data-file-id="<%= file._id %>"
+                          title="<%= file.isStarred ? 'Starred' : 'Add to Starred' %>"
+                        >
+                          <i class="fa-<%= file.isStarred ? 'solid' : 'regular' %> fa-star"></i>
+                        </button>
+
+                        <!-- Action Dropdown Top Right -->
+                        <div class="dropdown position-absolute top-0 end-0 m-2">
+                          <button class="btn btn-sm btn-light bg-white rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 30px; height: 30px;">
+                            <i class="fa-solid fa-ellipsis-vertical text-muted"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
+                            <% if (file.category === 'image' || file.category === 'pdf') { %>
+                              <li>
+                                <button 
+                                  class="dropdown-item py-2 btn-preview" 
+                                  data-file-id="<%= file._id %>"
+                                  data-file-name="<%= file.originalName %>"
+                                  data-mime="<%= file.mimeType %>"
+                                >
+                                  <i class="fa-solid fa-eye me-2 text-primary"></i>Preview
+                                </button>
+                              </li>
+                            <% } %>
+                            <li>
+                              <a class="dropdown-item py-2" href="/api/files/<%= file._id %>/download">
+                                <i class="fa-solid fa-download me-2 text-dark"></i>Download
+                              </a>
+                            </li>
+                            <li>
+                              <button 
+                                class="dropdown-item py-2 btn-rename-file" 
+                                data-file-id="<%= file._id %>"
+                                data-file-name="<%= file.originalName %>"
+                              >
+                                <i class="fa-solid fa-pen me-2 text-info"></i>Rename
+                              </button>
+                            </li>
+                            <li>
+                              <button 
+                                class="dropdown-item py-2 btn-move-file" 
+                                data-file-id="<%= file._id %>"
+                                data-file-name="<%= file.originalName %>"
+                              >
+                                <i class="fa-solid fa-folder-tree me-2 text-secondary"></i>Move to Folder
+                              </button>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                              <button 
+                                class="dropdown-item py-2 text-danger btn-delete" 
+                                data-action="/api/files/<%= file._id %>"
+                                data-item-name="<%= file.originalName %>"
+                                data-item-type="file"
+                              >
+                                <i class="fa-solid fa-trash me-2"></i>Move to Trash
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      <!-- Card Body -->
+                      <div class="card-body p-3">
+                        <div class="fw-bold text-dark text-truncate mb-1" title="<%= file.originalName %>">
+                          <%= file.originalName %>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between text-muted small">
+                          <span><%= file.formattedSize %></span>
+                          <span><%= new Date(file.uploadedAt).toLocaleDateString() %></span>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+
+            <!-- LIST VIEW -->
+            <div id="filesListView" class="<%= viewMode === 'list' ? '' : 'd-none' %>">
+              <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-muted small text-uppercase">
+                      <tr>
+                        <th style="width: 40px;" class="ps-3"></th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Size</th>
+                        <th>Uploaded Date</th>
+                        <th class="text-end pe-4">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% files.forEach(function(file) { %>
+                        <tr class="file-item-wrapper" data-file-name="<%= file.originalName.toLowerCase() %>">
+                          <td class="ps-3">
+                            <button 
+                              class="btn btn-sm btn-icon star-btn border-0 p-0 <%= file.isStarred ? 'text-warning' : 'text-muted' %>" 
+                              data-file-id="<%= file._id %>"
+                            >
+                              <i class="fa-<%= file.isStarred ? 'solid' : 'regular' %> fa-star"></i>
+                            </button>
+                          </td>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <% if (file.category === 'image') { %>
+                                <i class="fa-solid fa-file-image text-primary fs-5 me-3"></i>
+                              <% } else if (file.category === 'pdf') { %>
+                                <i class="fa-solid fa-file-pdf text-danger fs-5 me-3"></i>
+                              <% } else if (file.category === 'document') { %>
+                                <i class="fa-solid fa-file-word text-info fs-5 me-3"></i>
+                              <% } else if (file.category === 'video') { %>
+                                <i class="fa-solid fa-file-video text-warning fs-5 me-3"></i>
+                              <% } else if (file.category === 'audio') { %>
+                                <i class="fa-solid fa-file-audio text-success fs-5 me-3"></i>
+                              <% } else if (file.category === 'archive') { %>
+                                <i class="fa-solid fa-file-zipper text-secondary fs-5 me-3"></i>
+                              <% } else { %>
+                                <i class="fa-solid fa-file text-dark fs-5 me-3"></i>
+                              <% } %>
+                              <span class="fw-semibold text-dark text-truncate" style="max-width: 320px;" title="<%= file.originalName %>">
+                                <%= file.originalName %>
+                              </span>
+                            </div>
+                          </td>
+                          <td>
+                            <span class="badge bg-light text-dark border text-capitalize"><%= file.category %></span>
+                          </td>
+                          <td class="text-muted small fw-medium"><%= file.formattedSize %></td>
+                          <td class="text-muted small"><%= new Date(file.uploadedAt).toLocaleDateString() %></td>
+                          <td class="text-end pe-4">
+                            <div class="d-inline-flex gap-1">
+                              <% if (file.category === 'image' || file.category === 'pdf') { %>
+                                <button 
+                                  class="btn btn-sm btn-light border btn-preview" 
+                                  data-file-id="<%= file._id %>"
+                                  data-file-name="<%= file.originalName %>"
+                                  data-mime="<%= file.mimeType %>"
+                                  title="Preview"
+                                >
+                                  <i class="fa-solid fa-eye text-primary"></i>
+                                </button>
+                              <% } %>
+                              <a href="/api/files/<%= file._id %>/download" class="btn btn-sm btn-light border" title="Download">
+                                <i class="fa-solid fa-download text-dark"></i>
+                              </a>
+                              <button 
+                                class="btn btn-sm btn-light border btn-rename-file" 
+                                data-file-id="<%= file._id %>"
+                                data-file-name="<%= file.originalName %>"
+                                title="Rename"
+                              >
+                                <i class="fa-solid fa-pen text-info"></i>
+                              </button>
+                              <button 
+                                class="btn btn-sm btn-light border btn-delete" 
+                                data-action="/api/files/<%= file._id %>"
+                                data-item-name="<%= file.originalName %>"
+                                data-item-type="file"
+                                title="Move to Trash"
+                              >
+                                <i class="fa-solid fa-trash text-danger"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      <% }); %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          <% } else { %>
+            <!-- Empty Folder State -->
+            <div class="card border-0 shadow-sm rounded-4 bg-white text-center py-5">
+              <div class="card-body">
+                <div class="text-muted mb-3">
+                  <i class="fa-solid fa-folder-open display-3 text-light-emphasis"></i>
+                </div>
+                <h5 class="fw-bold text-dark">This folder is empty</h5>
+                <p class="text-muted small mb-4">Drag and drop files here or click below to upload directly to AWS S3.</p>
+                <div class="d-flex justify-content-center gap-2">
+                  <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload Files
+                  </button>
+                  <button class="btn btn-outline-secondary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#newFolderModal">
+                    <i class="fa-solid fa-folder-plus me-1 text-warning"></i> New Subfolder
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% } %>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Include Shared Modals -->
+<%- include('partials/modals') %>
+
+<%- include('partials/footer') %>
+

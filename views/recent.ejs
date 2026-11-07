@@ -1,0 +1,145 @@
+<%- include('partials/header') %>
+
+<div class="app-wrapper d-flex">
+  <!-- Sidebar -->
+  <%- include('partials/sidebar') %>
+
+  <!-- Main Content Area -->
+  <div class="main-content flex-grow-1 min-vh-100 d-flex flex-column bg-light">
+    <!-- Topbar -->
+    <%- include('partials/topbar') %>
+
+    <!-- Page Body -->
+    <main class="content-body p-3 p-lg-4 flex-grow-1">
+      <div class="container-fluid p-0">
+        
+        <!-- Alerts and Flash Messages -->
+        <%- include('partials/toast') %>
+
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+          <div>
+            <h3 class="fw-bold text-dark mb-1">
+              <i class="fa-solid fa-clock-rotate-left text-success me-2"></i>Recent Files
+            </h3>
+            <p class="text-muted small mb-0">Quick access to your most recently uploaded and updated files.</p>
+          </div>
+          <div>
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#uploadModal">
+              <i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload File
+            </button>
+          </div>
+        </div>
+
+        <% if (files && files.length > 0) { %>
+          <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted small text-uppercase">
+                  <tr>
+                    <th class="ps-4">File Name</th>
+                    <th>Category</th>
+                    <th>File Size</th>
+                    <th>Uploaded Date</th>
+                    <th class="text-end pe-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% files.forEach(function(file) { %>
+                    <tr>
+                      <td class="ps-4">
+                        <div class="d-flex align-items-center">
+                          <% if (file.category === 'image') { %>
+                            <i class="fa-solid fa-file-image text-primary fs-4 me-3"></i>
+                          <% } else if (file.category === 'pdf') { %>
+                            <i class="fa-solid fa-file-pdf text-danger fs-4 me-3"></i>
+                          <% } else if (file.category === 'document') { %>
+                            <i class="fa-solid fa-file-word text-info fs-4 me-3"></i>
+                          <% } else if (file.category === 'video') { %>
+                            <i class="fa-solid fa-file-video text-warning fs-4 me-3"></i>
+                          <% } else if (file.category === 'audio') { %>
+                            <i class="fa-solid fa-file-audio text-success fs-4 me-3"></i>
+                          <% } else if (file.category === 'archive') { %>
+                            <i class="fa-solid fa-file-zipper text-secondary fs-4 me-3"></i>
+                          <% } else { %>
+                            <i class="fa-solid fa-file text-dark fs-4 me-3"></i>
+                          <% } %>
+                          <div>
+                            <div class="fw-semibold text-dark text-truncate" style="max-width: 320px;" title="<%= file.originalName %>">
+                              <%= file.originalName %>
+                            </div>
+                            <span class="text-muted" style="font-size: 0.72rem;"><%= file.mimeType %></span>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="badge bg-light text-dark border text-capitalize"><%= file.category %></span>
+                      </td>
+                      <td class="text-muted small fw-medium"><%= file.formattedSize %></td>
+                      <td class="text-muted small">
+                        <%= new Date(file.uploadedAt).toLocaleString() %>
+                      </td>
+                      <td class="text-end pe-4">
+                        <div class="d-inline-flex gap-1">
+                          <% if (file.category === 'image' || file.category === 'pdf') { %>
+                            <button 
+                              class="btn btn-sm btn-light border btn-preview" 
+                              data-file-id="<%= file._id %>"
+                              data-file-name="<%= file.originalName %>"
+                              data-mime="<%= file.mimeType %>"
+                              title="Preview"
+                            >
+                              <i class="fa-solid fa-eye text-primary"></i>
+                            </button>
+                          <% } %>
+                          <a href="/api/files/<%= file._id %>/download" class="btn btn-sm btn-light border" title="Download">
+                            <i class="fa-solid fa-download text-dark"></i>
+                          </a>
+                          <button 
+                            class="btn btn-sm btn-light border btn-rename-file" 
+                            data-file-id="<%= file._id %>"
+                            data-file-name="<%= file.originalName %>"
+                            title="Rename"
+                          >
+                            <i class="fa-solid fa-pen text-info"></i>
+                          </button>
+                          <button 
+                            class="btn btn-sm btn-light border btn-delete" 
+                            data-action="/api/files/<%= file._id %>"
+                            data-item-name="<%= file.originalName %>"
+                            data-item-type="file"
+                            title="Move to Trash"
+                          >
+                            <i class="fa-solid fa-trash text-danger"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="card border-0 shadow-sm rounded-4 bg-white text-center py-5">
+            <div class="card-body">
+              <i class="fa-solid fa-clock-rotate-left display-3 text-muted mb-3 d-block"></i>
+              <h5 class="fw-bold text-dark">No recent files</h5>
+              <p class="text-muted small mb-4">Files you upload will appear here in chronological order.</p>
+              <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload File
+              </button>
+            </div>
+          </div>
+        <% } %>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Include Shared Modals -->
+<%- include('partials/modals') %>
+
+<%- include('partials/footer') %>
+

@@ -1,0 +1,319 @@
+<%- include('partials/header') %>
+
+<div class="app-wrapper d-flex">
+  <!-- Sidebar -->
+  <%- include('partials/sidebar') %>
+
+  <!-- Main Content Area -->
+  <div class="main-content flex-grow-1 min-vh-100 d-flex flex-column bg-light">
+    <!-- Topbar -->
+    <%- include('partials/topbar') %>
+
+    <!-- Page Body -->
+    <main class="content-body p-3 p-lg-4 flex-grow-1">
+      <div class="container-fluid p-0">
+        
+        <!-- Alerts and Flash Messages -->
+        <%- include('partials/toast') %>
+
+        <!-- Dashboard Welcome & Quick Actions -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+          <div>
+            <h3 class="fw-bold text-dark mb-1">
+              Welcome back, <%= currentUser ? currentUser.name.split(' ')[0] : 'User' %>!
+            </h3>
+            <p class="text-muted small mb-0">Here is an overview of your cloud storage and recent activity.</p>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#uploadModal">
+              <i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload Files
+            </button>
+            <button class="btn btn-outline-secondary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#newFolderModal">
+              <i class="fa-solid fa-folder-plus me-1 text-warning"></i> New Folder
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Overview Cards -->
+        <div class="row g-3 mb-4">
+          <!-- Total Files -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  <div class="text-muted small fw-semibold">Total Files</div>
+                  <div class="fs-3 fw-bold text-dark mt-1"><%= stats.totalFiles %></div>
+                  <div class="small text-muted mt-1">
+                    <a href="/files" class="text-decoration-none text-primary">Browse all &rarr;</a>
+                  </div>
+                </div>
+                <div class="bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                  <i class="fa-solid fa-file-lines fs-4"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Folders -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  <div class="text-muted small fw-semibold">Total Folders</div>
+                  <div class="fs-3 fw-bold text-dark mt-1"><%= stats.totalFolders %></div>
+                  <div class="small text-muted mt-1">
+                    <a href="/folders" class="text-decoration-none text-info">View folders &rarr;</a>
+                  </div>
+                </div>
+                <div class="bg-info-subtle text-info rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                  <i class="fa-solid fa-folder fs-4"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Storage Used -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  <div class="text-muted small fw-semibold">Storage Used</div>
+                  <div class="fs-3 fw-bold text-dark mt-1"><%= stats.formattedUsed %></div>
+                  <div class="small text-muted mt-1">
+                    of <%= stats.formattedQuota %> allocated
+                  </div>
+                </div>
+                <div class="bg-warning-subtle text-warning rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                  <i class="fa-solid fa-hard-drive fs-4"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Available Quota -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+              <div class="d-flex align-items-center justify-content-between">
+                <div>
+                  <div class="text-muted small fw-semibold">Free Storage</div>
+                  <div class="fs-3 fw-bold text-success mt-1"><%= stats.formattedRemaining %></div>
+                  <div class="small text-muted mt-1">
+                    <%= 100 - stats.storagePercentage %>% remaining
+                  </div>
+                </div>
+                <div class="bg-success-subtle text-success rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                  <i class="fa-solid fa-cloud-arrow-up fs-4"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Storage Quota Gauge & Chart Visualization Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+          <div class="row align-items-center g-4">
+            <!-- Left Side: Usage Bar & Quota Stats -->
+            <div class="col-lg-7">
+              <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3">
+                <div>
+                  <h5 class="fw-bold text-dark mb-1">
+                    <i class="fa-solid fa-chart-column text-primary me-2"></i>Storage Usage & Quota
+                  </h5>
+                  <p class="text-muted small mb-0">Visual breakdown of your storage consumed vs available allocation</p>
+                </div>
+                <div class="mt-2 mt-sm-0">
+                  <span class="badge <%= stats.isNearQuota ? 'bg-warning text-dark' : 'bg-primary' %> fs-6 px-3 py-2 rounded-pill">
+                    <%= stats.storagePercentage %>% Used
+                  </span>
+                </div>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="progress mb-2" style="height: 12px; border-radius: 6px;">
+                <div 
+                  class="progress-bar <%= stats.isNearQuota ? (stats.isQuotaExceeded ? 'bg-danger' : 'bg-warning') : 'bg-primary' %> progress-bar-striped" 
+                  role="progressbar" 
+                  style="width: <%= stats.storagePercentage %>%" 
+                  aria-valuenow="<%= stats.storagePercentage %>" 
+                  aria-valuemin="0" 
+                  aria-valuemax="100"
+                ></div>
+              </div>
+
+              <div class="d-flex justify-content-between small text-muted mb-3">
+                <span><strong><%= stats.formattedUsed %></strong> consumed</span>
+                <span>Total limit: <strong><%= stats.formattedQuota %></strong></span>
+              </div>
+
+              <div class="p-3 bg-light rounded-3 d-flex flex-wrap align-items-center justify-content-between gap-2 small">
+                <div>
+                  <span class="text-muted">Available Free Space:</span>
+                  <strong class="text-success ms-1"><%= stats.formattedRemaining %></strong>
+                </div>
+                <div>
+                  <span class="text-muted">Cloud Provider:</span>
+                  <span class="badge bg-warning text-dark ms-1"><i class="fa-brands fa-aws me-1"></i><%= storageProvider.toUpperCase() %></span>
+                </div>
+                <a href="/profile" class="text-decoration-none fw-semibold">Manage Quota &rarr;</a>
+              </div>
+            </div>
+
+            <!-- Right Side: Interactive Storage Distribution Doughnut Chart -->
+            <div class="col-lg-5 text-center">
+              <h6 class="small fw-bold text-muted text-uppercase mb-2">Storage Breakdown by Category</h6>
+              <div style="position: relative; height: 180px; width: 100%;">
+                <canvas id="storageChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden Data Holder for Chart.js -->
+        <div id="chartDataHolder" 
+          data-used="<%= stats.storageUsed %>"
+          data-remaining="<%= stats.remainingStorage %>"
+          data-images="<%= categories.image ? categories.image.size : 0 %>"
+          data-docs="<%= categories.document ? categories.document.size : 0 %>"
+          data-pdfs="<%= categories.pdf ? categories.pdf.size : 0 %>"
+          data-media="<%= (categories.video ? categories.video.size : 0) + (categories.audio ? categories.audio.size : 0) %>"
+          data-archives="<%= categories.archive ? categories.archive.size : 0 %>"
+          data-other="<%= categories.other ? categories.other.size : 0 %>"
+          style="display: none;"
+        ></div>
+
+        <!-- Category Breakdown Cards -->
+        <h5 class="fw-bold text-dark mb-3">Storage Categories</h5>
+        <div class="row g-3 mb-4">
+          <% Object.keys(categories).forEach(function(key) { 
+              const cat = categories[key];
+          %>
+            <div class="col-6 col-md-4 col-xl-2">
+              <a href="/files?category=<%= key %>" class="text-decoration-none">
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 hover-card transition-all">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="bg-<%= cat.color %>-subtle text-<%= cat.color %> rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                      <i class="fa-solid <%= cat.icon %> fs-5"></i>
+                    </div>
+                    <span class="badge bg-light text-dark border"><%= cat.count %></span>
+                  </div>
+                  <div class="fw-bold text-dark small"><%= cat.label %></div>
+                  <div class="text-muted" style="font-size: 0.75rem;"><%= formatBytes(cat.size) %></div>
+                </div>
+              </a>
+            </div>
+          <% }); %>
+        </div>
+
+        <!-- Recent Uploads Section -->
+        <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+          <div class="card-header bg-white border-bottom p-3 d-flex align-items-center justify-content-between">
+            <h5 class="fw-bold text-dark mb-0">
+              <i class="fa-solid fa-clock-rotate-left text-success me-2"></i>Recent Files
+            </h5>
+            <a href="/recent" class="small text-decoration-none fw-semibold">View All (<%= stats.totalFiles %>) &rarr;</a>
+          </div>
+          <div class="card-body p-0">
+            <% if (recentFiles && recentFiles.length > 0) { %>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light text-muted small text-uppercase">
+                    <tr>
+                      <th class="ps-4">File Name</th>
+                      <th>Category</th>
+                      <th>Size</th>
+                      <th>Uploaded</th>
+                      <th class="text-end pe-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% recentFiles.forEach(function(file) { %>
+                      <tr>
+                        <td class="ps-4">
+                          <div class="d-flex align-items-center">
+                            <% if (file.category === 'image') { %>
+                              <i class="fa-solid fa-file-image text-primary fs-4 me-3"></i>
+                            <% } else if (file.category === 'pdf') { %>
+                              <i class="fa-solid fa-file-pdf text-danger fs-4 me-3"></i>
+                            <% } else if (file.category === 'document') { %>
+                              <i class="fa-solid fa-file-word text-info fs-4 me-3"></i>
+                            <% } else if (file.category === 'video') { %>
+                              <i class="fa-solid fa-file-video text-warning fs-4 me-3"></i>
+                            <% } else if (file.category === 'audio') { %>
+                              <i class="fa-solid fa-file-audio text-success fs-4 me-3"></i>
+                            <% } else if (file.category === 'archive') { %>
+                              <i class="fa-solid fa-file-zipper text-secondary fs-4 me-3"></i>
+                            <% } else { %>
+                              <i class="fa-solid fa-file text-dark fs-4 me-3"></i>
+                            <% } %>
+                            <div>
+                              <div class="fw-semibold text-dark text-truncate" style="max-width: 280px;" title="<%= file.originalName %>">
+                                <%= file.originalName %>
+                              </div>
+                              <span class="text-muted" style="font-size: 0.72rem;"><%= file.mimeType %></span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="badge bg-light text-dark border text-capitalize"><%= file.category %></span>
+                        </td>
+                        <td class="text-muted small fw-medium"><%= file.formattedSize %></td>
+                        <td class="text-muted small"><%= new Date(file.uploadedAt).toLocaleDateString() %></td>
+                        <td class="text-end pe-4">
+                          <div class="d-inline-flex gap-1">
+                            <% if (file.category === 'image' || file.category === 'pdf') { %>
+                              <button 
+                                class="btn btn-sm btn-light border btn-preview" 
+                                data-file-id="<%= file._id %>"
+                                data-file-name="<%= file.originalName %>"
+                                data-mime="<%= file.mimeType %>"
+                                title="Preview File"
+                              >
+                                <i class="fa-solid fa-eye text-primary"></i>
+                              </button>
+                            <% } %>
+                            <a 
+                              href="/api/files/<%= file._id %>/download" 
+                              class="btn btn-sm btn-light border" 
+                              title="Download (Presigned URL)"
+                            >
+                              <i class="fa-solid fa-download text-dark"></i>
+                            </a>
+                            <button 
+                              class="btn btn-sm btn-light border btn-delete" 
+                              data-action="/api/files/<%= file._id %>"
+                              data-item-name="<%= file.originalName %>"
+                              data-item-type="file"
+                              title="Move to Trash"
+                            >
+                              <i class="fa-solid fa-trash text-danger"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+              </div>
+            <% } else { %>
+              <div class="text-center py-5">
+                <i class="fa-solid fa-cloud-arrow-up fs-1 text-muted mb-3 d-block"></i>
+                <h6 class="fw-bold text-dark">No files uploaded yet</h6>
+                <p class="text-muted small mb-3">Upload your first file to AWS S3 to get started.</p>
+                <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                  <i class="fa-solid fa-plus me-1"></i> Upload File
+                </button>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Include Shared Modals -->
+<%- include('partials/modals') %>
+
+<%- include('partials/footer') %>
+

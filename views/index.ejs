@@ -1,0 +1,190 @@
+<%- include('partials/header') %>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-3">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center fw-bold" href="/">
+      <div class="brand-icon bg-primary text-white rounded-3 d-flex align-items-center justify-content-center me-2" style="width: 38px; height: 38px;">
+        <i class="fa-solid fa-cloud fs-5"></i>
+      </div>
+      <span class="text-primary fs-4">Cloud</span><span class="text-dark fs-4">Drive</span>
+      <span class="badge bg-warning text-dark ms-2 small"><i class="fa-brands fa-aws me-1"></i>S3</span>
+    </a>
+    <div class="d-flex align-items-center gap-2">
+      <a href="/login" class="btn btn-outline-primary rounded-pill px-4 fw-medium">Sign In</a>
+      <a href="/register" class="btn btn-primary rounded-pill px-4 fw-medium shadow-sm">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="py-5 bg-gradient-light border-bottom">
+  <div class="container py-lg-5">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <div class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-3">
+          <i class="fa-solid fa-shield-halved me-1"></i> Enterprise-Grade Cloud File Storage
+        </div>
+        <h1 class="display-4 fw-extrabold text-dark tracking-tight mb-3">
+          Secure, Scalable Cloud Storage Powered by <span class="text-primary">AWS S3</span> & <span class="text-success">MongoDB</span>
+        </h1>
+        <p class="lead text-muted mb-4 pe-lg-4">
+          Experience lightning-fast file uploads, folder organization, image & PDF previews, and short-lived presigned download URLs. Built with modern full-stack cloud computing principles.
+        </p>
+        <div class="d-flex flex-wrap gap-3 mb-4">
+          <a href="/register" class="btn btn-primary btn-lg rounded-pill px-5 shadow">
+            <i class="fa-solid fa-rocket me-2"></i>Create Free Account
+          </a>
+          <a href="/login" class="btn btn-outline-dark btn-lg rounded-pill px-4">
+            <i class="fa-solid fa-right-to-bracket me-2"></i>Live Demo Sign In
+          </a>
+        </div>
+        <div class="d-flex align-items-center gap-4 text-muted small">
+          <div><i class="fa-solid fa-check text-success me-1"></i> 500 MB Free Storage</div>
+          <div><i class="fa-solid fa-check text-success me-1"></i> AWS Presigned URLs</div>
+          <div><i class="fa-solid fa-check text-success me-1"></i> Private S3 Bucket</div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden p-3 bg-white">
+          <div class="bg-dark text-white rounded-3 p-3 mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="small fw-bold"><i class="fa-brands fa-aws text-warning me-2"></i>AWS S3 Bucket Status</span>
+              <span class="badge bg-success">Active & Encrypted</span>
+            </div>
+            <div class="font-monospace small text-white-50" style="font-size: 0.75rem;">
+              PutObjectCommand &rarr; Encrypted At Rest<br>
+              GetObjectCommand &rarr; Presigned (900s TTL)
+            </div>
+          </div>
+          <div class="p-3 bg-light rounded-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="small fw-bold text-dark"><i class="fa-solid fa-hard-drive me-2 text-primary"></i>User Storage Quota</span>
+              <span class="small fw-bold text-primary">35% Used</span>
+            </div>
+            <div class="progress mb-3" style="height: 8px;">
+              <div class="progress-bar bg-primary" style="width: 35%"></div>
+            </div>
+            <div class="list-group list-group-flush rounded-3 small">
+              <div class="list-group-item d-flex align-items-center justify-content-between bg-white py-2">
+                <span><i class="fa-solid fa-file-pdf text-danger me-2"></i>Annual_Report_2026.pdf</span>
+                <span class="badge bg-light text-dark">4.2 MB</span>
+              </div>
+              <div class="list-group-item d-flex align-items-center justify-content-between bg-white py-2">
+                <span><i class="fa-solid fa-file-image text-primary me-2"></i>Product_Architecture.png</span>
+                <span class="badge bg-light text-dark">1.8 MB</span>
+              </div>
+              <div class="list-group-item d-flex align-items-center justify-content-between bg-white py-2">
+                <span><i class="fa-solid fa-folder text-warning me-2"></i>Engineering Docs</span>
+                <span class="badge bg-light text-dark">12 Files</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Grid -->
+<section class="py-5 bg-white">
+  <div class="container py-lg-4">
+    <div class="text-center mb-5">
+      <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold mb-2">Key Capabilities</span>
+      <h2 class="fw-bold text-dark">Built for Scale, Security, and Simplicity</h2>
+      <p class="text-muted mx-auto" style="max-width: 650px;">
+        Everything you need to store, manage, and collaborate on files in a modern cloud-native architecture.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 border rounded-4 p-4 shadow-sm hover-shadow transition-all">
+          <div class="feature-icon bg-primary-subtle text-primary rounded-3 d-inline-flex p-3 mb-3" style="width: fit-content;">
+            <i class="fa-brands fa-aws fs-3"></i>
+          </div>
+          <h5 class="fw-bold text-dark">AWS S3 Cloud Storage</h5>
+          <p class="text-muted small">
+            Directly integrates with Amazon Simple Storage Service using AWS SDK for JavaScript v3. Keeps objects private and securely accessible.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 border rounded-4 p-4 shadow-sm hover-shadow transition-all">
+          <div class="feature-icon bg-success-subtle text-success rounded-3 d-inline-flex p-3 mb-3" style="width: fit-content;">
+            <i class="fa-solid fa-key fs-3"></i>
+          </div>
+          <h5 class="fw-bold text-dark">Temporary Presigned URLs</h5>
+          <p class="text-muted small">
+            Files are never publicly exposed. Downloads and previews generate short-lived signed URLs with 15-minute expiration directly from S3.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 border rounded-4 p-4 shadow-sm hover-shadow transition-all">
+          <div class="feature-icon bg-warning-subtle text-warning rounded-3 d-inline-flex p-3 mb-3" style="width: fit-content;">
+            <i class="fa-solid fa-folder-tree fs-3"></i>
+          </div>
+          <h5 class="fw-bold text-dark">Nested Folder Organization</h5>
+          <p class="text-muted small">
+            Organize files into customized folders with color tags, breadcrumb navigation, and instantaneous move/reassignment tools.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 border rounded-4 p-4 shadow-sm hover-shadow transition-all">
+          <div class="feature-icon bg-info-subtle text-info rounded-3 d-inline-flex p-3 mb-3" style="width: fit-content;">
+            <i class="fa-solid fa-gauge-high fs-3"></i>
+          </div>
+          <h5 class="fw-bold text-dark">Storage Quota Tracking</h5>
+          <p class="text-muted small">
+            Automated quota calculations in MongoDB with visual progress bars and warning notifications whenever usage exceeds 80%.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 border rounded-4 p-4 shadow-sm hover-shadow transition-all">
+          <div class="feature-icon bg-danger-subtle text-danger rounded-3 d-inline-flex p-3 mb-3" style="width: fit-content;">
+            <i class="fa-solid fa-eye fs-3"></i>
+          </div>
+          <h5 class="fw-bold text-dark">Instant Previews (PDF & Images)</h5>
+          <p class="text-muted small">
+            Preview images and PDFs seamlessly inside a responsive viewer without having to download them to your device first.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 border rounded-4 p-4 shadow-sm hover-shadow transition-all">
+          <div class="feature-icon bg-secondary-subtle text-secondary rounded-3 d-inline-flex p-3 mb-3" style="width: fit-content;">
+            <i class="fa-solid fa-trash-can-arrow-up fs-3"></i>
+          </div>
+          <h5 class="fw-bold text-dark">Trash & Recovery</h5>
+          <p class="text-muted small">
+            Accidentally deleted a file? Safely recover it from the Trash bin or permanently purge it from AWS S3 and database when ready.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-4 border-top">
+  <div class="container text-center text-md-start d-md-flex align-items-center justify-content-between">
+    <div class="mb-3 mb-md-0">
+      <span class="fw-bold text-white fs-5"><i class="fa-solid fa-cloud text-primary me-2"></i>CloudDrive</span>
+      <p class="text-white-50 small mb-0">Cloud-Based File Storage and Management System</p>
+    </div>
+    <div class="text-white-50 small">
+      Built with Node.js &bull; Express.js &bull; MongoDB &bull; AWS S3 SDK v3 &bull; EJS
+    </div>
+  </div>
+</footer>
+
+<%- include('partials/footer') %>
+

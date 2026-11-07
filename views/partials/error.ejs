@@ -1,0 +1,20 @@
+<%- include('./header') %>
+
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light p-4">
+  <div class="text-center p-5 bg-white rounded-4 shadow-sm" style="max-width: 550px;">
+    <div class="display-1 text-danger fw-bold mb-3"><%= typeof status !== 'undefined' ? status : 500 %></div>
+    <h3 class="fw-bold text-dark mb-2">Something Went Wrong</h3>
+    <p class="text-muted mb-4"><%= typeof message !== 'undefined' ? message : 'An unexpected server error occurred.' %></p>
+    <div class="d-flex justify-content-center gap-3">
+      <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+        <i class="fa-solid fa-arrow-left me-2"></i>Go Back
+      </a>
+      <a href="/dashboard" class="btn btn-primary rounded-pill px-4 py-2">
+        <i class="fa-solid fa-house me-2"></i>Dashboard
+      </a>
+    </div>
+  </div>
+</div>
+
+<%- include('./footer') %>
+
